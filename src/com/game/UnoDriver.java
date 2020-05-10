@@ -2,6 +2,7 @@ package com.game;
 
 public class UnoDriver {
     public static void main(String[] args) {
-        System.out.println("yeet");
+        Card c = new Card(Card.Color.RED, Card.Value.ONE);
+        System.out.println(c.toString());
     }
 }
