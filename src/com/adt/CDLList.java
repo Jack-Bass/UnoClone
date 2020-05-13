@@ -33,11 +33,13 @@ public class CDLList<T extends Comparable<T>> {
             if ( pred == null ) {
                 newNode.next = head;
                 newNode.prev = head.prev;
-                head.prev = newNode;
+                newNode.next.prev = newNode;
+                newNode.prev.next = newNode;
                 head = newNode;
             }
             else {
                 newNode.next = pred.next;
+                newNode.next.prev = newNode;
                 newNode.prev = pred;
                 pred.next = newNode;
             }
@@ -53,7 +55,7 @@ public class CDLList<T extends Comparable<T>> {
         }
 
         Node<T> loc = findItem(item);
-        if ( loc == null || loc.info != item ) {
+        if ( loc == null || loc.info.compareTo(item) != 0 ) {
             //do some spicy exception handling
             throw new UnsupportedOperationException();
         }
@@ -97,11 +99,10 @@ public class CDLList<T extends Comparable<T>> {
     }
 
     public void printList() {
-        Node<T> copy = head;
         System.out.print("LIST: ");
         for ( int i = 0; i < length; i++ ) {
-            System.out.print(copy.info.toString() + " -> ");
-            copy = copy.next;
+            System.out.print(head.info.toString() + " -> ");
+            head = head.next;
         }
         System.out.println();
     }
