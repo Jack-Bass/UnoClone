@@ -14,11 +14,15 @@ public class CDLList<T extends Comparable<T>> {
         return length;
     }
 
+    public boolean isEmpty() {
+        return (length == 0);
+    }
+
     public void add(T item) {
         Node<T> newNode = new Node<>();
         newNode.info = item;
 
-        if ( head == null ) {
+        if ( isEmpty() ) {
             head = newNode;
             head.next = head;
             head.prev = head;
@@ -30,6 +34,7 @@ public class CDLList<T extends Comparable<T>> {
                 newNode.next = head;
                 newNode.prev = head.prev;
                 head.prev = newNode;
+                head = newNode;
             }
             else {
                 newNode.next = pred.next;
@@ -39,6 +44,24 @@ public class CDLList<T extends Comparable<T>> {
         }
 
         length++;
+    }
+
+    public void delete(T item) {
+        if ( isEmpty() ) {
+            //do some spicy exception handling
+            throw new UnsupportedOperationException();
+        }
+
+        Node<T> loc = findItem(item);
+        if ( loc == null || loc.info != item ) {
+            //do some spicy exception handling
+            throw new UnsupportedOperationException();
+        }
+
+        loc.prev.next = loc.next;
+        loc.next.prev = loc.prev;
+
+        length--;
     }
 
     private Node<T> findItem(T item) {
@@ -59,5 +82,27 @@ public class CDLList<T extends Comparable<T>> {
         }
 
         return pred;
+    }
+
+    public void fastForward(int n) {
+        for ( int i = 0; i < n; i++ ) {
+            head = head.next;
+        }
+    }
+
+    public void rewind(int n) {
+        for ( int i = 0; i < n; i++ ) {
+            head = head.prev;
+        }
+    }
+
+    public void printList() {
+        Node<T> copy = head;
+        System.out.print("LIST: ");
+        for ( int i = 0; i < length; i++ ) {
+            System.out.print(copy.info.toString() + " -> ");
+            copy = copy.next;
+        }
+        System.out.println();
     }
 }
