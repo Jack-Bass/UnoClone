@@ -1,6 +1,7 @@
 package com.game;
 
 import com.adt.CDLList;
+import java.util.Stack;
 
 public class Hand {
     //instance variables
@@ -22,12 +23,12 @@ public class Hand {
         hand.add(c);
     }
 
-    public CDLList<Card> emptyHand() {
-        CDLList<Card> discard = new CDLList<>();
+    public Stack<Card> emptyHand() {
+        Stack<Card> discard = new Stack<>();
 
         for ( int i = 0; i < hand.getLength(); i++ ) {
             Card c = hand.getAt(0);
-            discard.add(c);
+            discard.push(c);
             hand.delete(c);
         }
 

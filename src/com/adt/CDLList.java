@@ -68,8 +68,15 @@ public class CDLList<T extends Comparable<T>> {
 
     public T getAt(int index) {
         Node<T> copy = head;
-        for ( int i = 0; i < index; i++ ) {
-            copy = copy.next;
+        if ( index < (length-1)/2 ) {
+            for ( int i = 0; i < index; i++ ) {
+                copy = copy.next;
+            }
+        }
+        else {
+            for ( int i = 0; i < length-index; i++ ) {
+                copy = copy.prev;
+            }
         }
         return copy.info;
     }
