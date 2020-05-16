@@ -68,6 +68,15 @@ public class Deck {
         return c;
     }
 
+    public void add(Card c) {
+        Card[] newDeck = new Card[deck.length+1];
+        for ( int i = 0; i < deck.length; i++ ) {
+            newDeck[i] = deck[i];
+        }
+        newDeck[deck.length] = c;
+        deck = newDeck;
+    }
+
     public void shuffle() {
         Random rand = new Random();
         int numSwaps = 432;
