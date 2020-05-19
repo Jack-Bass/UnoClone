@@ -13,6 +13,21 @@ public class Card implements Comparable<Card> {
         public int getValue() {
             return value;
         }
+
+        public javafx.scene.paint.Color toColor() {
+            switch(this) {
+                case RED:
+                return javafx.scene.paint.Color.RED;
+                case GREEN:
+                return javafx.scene.paint.Color.GREEN;
+                case BLUE:
+                return javafx.scene.paint.Color.BLUE;
+                case YELLOW:
+                return javafx.scene.paint.Color.YELLOW;
+                default:
+                return javafx.scene.paint.Color.BLACK;
+            }
+        }
     }
 
     public enum Value {
@@ -26,6 +41,42 @@ public class Card implements Comparable<Card> {
 
         public int getValue() {
             return value;
+        }
+
+        @Override
+        public String toString() {
+            switch(this) {
+                case ONE:
+                return "1";
+                case TWO:
+                return "2";
+                case THREE:
+                return "3";
+                case FOUR:
+                return "4";
+                case FIVE:
+                return "5";
+                case SIX:
+                return "6";
+                case SEVEN:
+                return "7";
+                case EIGHT:
+                return "8";
+                case NINE:
+                return "9";
+                case SKIP:
+                return "\u29b8";
+                case REVERSE:
+                return "\u21ba";
+                case DRAW2:
+                return "+2";
+                case WILD:
+                return "Wild";
+                case DRAW4:
+                return "+4";
+                default:
+                return "Uno!";
+            }
         }
     }
 
