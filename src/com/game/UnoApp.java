@@ -1,13 +1,12 @@
 package com.game;
 
-import com.graphics.*;
+//import com.graphics.*;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 
 public class UnoApp extends Application {
     //instance variables
@@ -23,13 +22,12 @@ public class UnoApp extends Application {
         Card card4 = new Card(Card.Color.YELLOW, Card.Value.DRAW2);
         Card card5 = new Card(Card.Color.BLACK, Card.Value.WILD);
         Card card6 = new Card(Card.Color.BLACK, Card.Value.DRAW4);
-        CardBuilder cb = new CardBuilder();
-        hand.getChildren().add(cb.getCardFront(card));
-        hand.getChildren().add(cb.getCardFront(card2));
-        hand.getChildren().add(cb.getCardFront(card3));
-        hand.getChildren().add(cb.getCardFront(card4));
-        hand.getChildren().add(cb.getCardFront(card5));
-        hand.getChildren().add(cb.getCardFront(card6));
+        hand.getChildren().add(CardBuilder.getCardFront(card));
+        hand.getChildren().add(CardBuilder.getCardFront(card2));
+        hand.getChildren().add(CardBuilder.getCardFront(card3));
+        hand.getChildren().add(CardBuilder.getCardFront(card4));
+        hand.getChildren().add(CardBuilder.getCardFront(card5));
+        hand.getChildren().add(CardBuilder.getCardFront(card6));
         vbox.getChildren().addAll(hand);
 
         //draw this bad boi
