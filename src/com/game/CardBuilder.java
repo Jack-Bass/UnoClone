@@ -21,8 +21,10 @@ public class CardBuilder {
     public static StackPane getCardBack() {
         Rectangle base = getCardBase();
         Rectangle color = getCardColor(new Card(Card.Color.BLACK, Card.Value.ONE));
+        Text text = getCardText(new Card(Card.Color.RED,Card.Value.BACK));
+        text.setRotate(-45.0);
         StackPane sp = new StackPane();
-        sp.getChildren().addAll(base, color);
+        sp.getChildren().addAll(base, color, text);
         return sp;
     }
 
