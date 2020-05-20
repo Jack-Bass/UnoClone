@@ -12,6 +12,7 @@ public class CardBuilder {
         Rectangle base = getCardBase();
         Rectangle color = getCardColor(card);
         Ellipse el = getCardEllipse();
+        el.setRotate(30.0);
         Text text = getCardText(card);
         StackPane sp = new StackPane();
         sp.getChildren().addAll(base, color, el, text);
