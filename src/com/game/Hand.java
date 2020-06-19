@@ -15,7 +15,7 @@ public class Hand {
         return hand.getLength();
     }
 
-    public CDLList<Card> getHand() {
+    public CDLList<Card> getCards() {
         return hand;
     }
 

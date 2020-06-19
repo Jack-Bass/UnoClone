@@ -63,6 +63,11 @@ public class CDLList<T extends Comparable<T>> {
         loc.prev.next = loc.next;
         loc.next.prev = loc.prev;
 
+        //if head is deleted, move pointer to new head
+        if ( head == loc ) {
+            head = head.next;
+        }
+
         length--;
     }
 
