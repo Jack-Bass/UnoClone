@@ -1,23 +1,11 @@
 package com.game;
 
-import javafx.scene.layout.StackPane;
-import javafx.scene.Node;
-/*
-import javafx.scene.paint.Color;
-import javafx.scene.layout.Border;
-import javafx.scene.layout.BorderStroke;
-import javafx.scene.layout.BorderStrokeStyle;
-import javafx.scene.layout.BorderWidths;
-import javafx.scene.layout.CornerRadii;
-*/
-import javafx.scene.control.Label;
+import javafx.application.Platform;
 
-abstract class Player implements Comparable<Player> {
+abstract class Player extends UnoGame implements Comparable<Player> {
     private String name;
     private int id;
     private Hand hand = new Hand();
-
-    public static Label msg = new Label("Welcome to Uno!");
 
     public String getName() {
         return name;
@@ -39,57 +27,116 @@ abstract class Player implements Comparable<Player> {
         return hand;
     }
 
+    public void initHand() {
+        for ( int i = 0; i < 7; i++ ) {
+            hand.addCard(deck.draw());
+        }
+    }
+
     public boolean isComputer() {
         return true;
     }
 
     abstract void updateImmediateCards();
 
-    /*
-    public StackPane[] getImmediateCards() {
-        return immediateCards;
-    }
+    abstract void playTurn();
 
-    public void updateImmediateCards() {
-        try {
-            for ( int i = 0; i < immediateCards.length; i++ ) {
-                if ( i < hand.getLength() ) {
-                    //immediateCards[i].getChildren().clear();
-                    Card c = hand.getCards().getAt(i);
-                    CardImage ci = new CardImage(c);
-                    //immediateCards[i] = CardBuilder.getCardFront(c);
-                    //CardBuilder.rewriteCard(immediateCards[i], CardBuilder.getCardFront(c));
-                    immediateCards[i] = (new CardImage(ci)).getCardImage();
-                    immediateCards[i].setVisible(true);
-                }
-                else {
-                    immediateCards[i].setVisible(false);
-                }
-            }
+    abstract void promptForNewColor();
 
-            if ( !isComputer() ) {
-                for ( int i = 0; i < immediateCards.length; i++ ) {
-                    Card card = hand.getCards().getAt(i);
-                    immediateCards[i].setOnMouseClicked(e -> {
-                        System.out.println(card.toString());
-                        playCard(card);
-                        updateImmediateCards();
-                    });
-                }
-            }
-        } catch( NullPointerException n ) {
-            immediateCards = new StackPane[5];
-            for ( int i = 0; i < immediateCards.length; i++ ) {
-                //immediateCards[i] = CardBuilder.getCardBack();
-                immediateCards[i] = (new CardImage()).getCardImage();
-            }
+    public boolean canPlay(Card c) {
+        Card top = discard.peek();
+        if ( c.getColor() == top.getColor() || c.getValue() == top.getValue() ) {
+            return true;
+        }
+        else if ( c.getColor() == top.getColor() && top.getValue() == Card.Value.BACK ) {
+            return true;
+        }
+        else if ( c.getColor() == Card.Color.BLACK ) {
+            return true;
+        }
+        else {
+            return false;
         }
     }
-    */
+
+    public boolean canPlayAnyCards() {
+        for ( int i = 0; i < hand.getLength(); i++ ) {
+            Card card = hand.getCards().getAt(i);
+            if ( canPlay(card) ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void playFirstAvailableCard() {
+        hand.getCards().reorientList();
+        Card c = deck.draw();
+        hand.getCards().add(c);
+        while ( !canPlay(c) ) {
+            if ( deck.isEmpty() ) {
+                resetDeck();
+            }
+            c = deck.draw();
+            hand.getCards().add(c);
+        }
+        playCard(c);
+    }
+
+    public void changeColor(Card.Color newColor) {
+        try {
+            Platform.runLater(() -> {
+                msg.setText("Changed color to " + newColor.toString());
+            });
+            Thread.sleep(2000);
+
+            //add dummy card to top of pile
+            discard.push(new Card(newColor, Card.Value.BACK));
+        } catch( InterruptedException i ) {
+            i.printStackTrace();
+        }
+    }
 
     public void playCard(Card c) {
-        getHand().getCards().delete(c);
-        msg.setText(c.toString());
+        try {
+            Platform.runLater(() -> {
+                msg.setText(name + " plays " + c.toString());
+                hand.getCards().delete(c);
+                updateImmediateCards();
+                discard.push(c);
+                CardImage.rewriteCard(discardGraphic, c);
+            });
+            //see if dummy card is on top
+            if ( discard.peek().getValue() == Card.Value.BACK ) {
+                discard.pop();
+            }
+
+            //perform cards action
+            skipTo = 0;
+            if ( c.getColor() == Card.Color.BLACK ) {
+                promptForNewColor();
+                if ( c.getValue() == Card.Value.DRAW4 ) {
+                    numDraw = 4;
+                }
+            }
+            else if ( c.getValue() == Card.Value.DRAW2 ) {
+                numDraw = 2;
+            }
+            else if ( c.getValue() == Card.Value.SKIP ) {
+                skipTo++;
+            }
+            else if ( c.getValue() == Card.Value.REVERSE ) {
+                isReversed = !isReversed;
+            }
+            else {
+                //do nothing for normal cards
+            }
+            skipTo++;
+
+            Thread.sleep(2000);
+        } catch( InterruptedException i ) {
+            i.printStackTrace();
+        }
     }
 
     public boolean hasUno() {
@@ -103,9 +150,5 @@ abstract class Player implements Comparable<Player> {
     @Override
     public int compareTo(Player p) {
         return Integer.compare(id, p.getId());
-    }
-
-    public static Label getMessage() {
-        return msg;
     }
 }

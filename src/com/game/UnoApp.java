@@ -2,14 +2,12 @@ package com.game;
 
 import com.adt.CDLList;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
-//import javafx.scene.layout.GridPane;
-//import javafx.scene.text.Text;
-//import javafx.scene.text.TextAlignment;
 import javafx.scene.text.Font;
 import javafx.scene.control.Label;
 import javafx.scene.control.Button;
@@ -39,6 +37,7 @@ public class UnoApp extends Application {
     private Label numCardsCom2;
     private StackPane cardsCom3;
     private Label numCardsCom3;
+    private StackPane discGraphic;
 
     @Override
     public void start(Stage stage) {
@@ -72,7 +71,7 @@ public class UnoApp extends Application {
         HBox hand3 = new HBox();
         HBox hand4 = new HBox();
 
-        msg = Player.getMessage();
+        msg = UnoGame.msg;
         msg.setFont(Font.font("Verdana", 40));
         msg.setPrefWidth(1080.0);
         msg.setAlignment(Pos.CENTER);
@@ -124,9 +123,8 @@ public class UnoApp extends Application {
 
         Label discardLabel = new Label("Discard Pile:");
         discardLabel.setFont(Font.font("Verdana", 20));
-        StackPane discard = new StackPane();
-        discard = CardImage.getCardBack();
-        discard.setVisible(false);
+        discGraphic = UnoGame.discardGraphic;
+        discGraphic.setVisible(false);
 
         //add each component to the Stage
         vbox.getChildren().addAll(msg, boxes);
@@ -142,7 +140,7 @@ public class UnoApp extends Application {
         hand4.getChildren().add(left);
         hand4.getChildren().addAll(cardsHuman);
         hand4.getChildren().add(right);
-        rightSide.getChildren().addAll(discardLabel, discard);
+        rightSide.getChildren().addAll(discardLabel, discGraphic);
     }
 
     private void playGame() {
@@ -154,56 +152,71 @@ public class UnoApp extends Application {
         players.add(com2);
         players.add(com3);
 
-        deck.shuffle();
+        UnoGame.initDeck();
         for ( int i = 0; i < players.getLength(); i++ ) {
-            for ( int j = 0; j < 7; j++ ) {
-                players.getAt(i).getHand().addCard(deck.draw());
-            }
-        }
-        for ( int i = 0; i < players.getLength(); i++ ) {
+            players.getAt(i).initHand();
             players.getAt(i).updateImmediateCards();
         }
+        UnoGame.initDiscard();
 
-        while ( isPlaying ) {
-            //play a turn
-            //Player p = players.getAt(0);
-            //
-        }
-    }
-
-    /*
-    private void updateImmediateCards(Player p, StackPane[] sp) {
         try {
-            for ( int i = 0; i < sp.length; i++ ) {
-                if ( i < p.getHand().getLength() ) {
-                    if ( !p.isComputer() ) {
-                        Card c = p.getHand().getCards().getAt(i);
-                        sp[i] = CardBuilder.getCardFront(c);
-                    }
-                    else {
-                        sp[i] = CardBuilder.getCardBack();
-                    }
-                    sp[i].setVisible(true);
-                }
-                else {
-                    sp[i].setVisible(false);
-                }
-            }
+            Thread.sleep(2000);
+            while ( isPlaying ) {
+                //play a turn
+                Player p = players.getAt(0);
+                Platform.runLater(() -> {
+                    msg.setText("It's " + p.getName() + "'s turn!");
+                });
+                Thread.sleep(1000);
 
-            if ( !p.isComputer() ) {
-                for ( int i = 0; i < sp.length; i++ ) {
-                    Card card = p.getHand().getCards().getAt(i);
-                    sp[i].setOnMouseClicked(e -> {
-                        System.out.println(card.toString());
+                //play player's turn
+                int numDraw = UnoGame.numDraw;
+                if ( numDraw > 0 ) {
+                    p.getHand().getCards().reorientList();
+                    for ( int i = 0; i < numDraw; i++ ) {
+                        if ( UnoGame.deck.isEmpty() ) {
+                            UnoGame.resetDeck();
+                        }
+                        p.getHand().getCards().add(UnoGame.deck.draw());
+                        Platform.runLater(() -> {
+                            msg.setText(p.getName() + " drew " + numDraw + " cards!");
+                        });
+                        Thread.sleep(1000);
+                    }
+                    UnoGame.skipTo = 1;
+                    UnoGame.numDraw = 0;
+                    Platform.runLater(() -> {
+                        p.updateImmediateCards();
                     });
                 }
+                else if ( !p.canPlayAnyCards() ) {
+                    p.playFirstAvailableCard();
+                }
+                else {
+                    p.playTurn();
+                }
+                Thread.sleep(1000);
+
+                //check for win conditions
+                if ( p.hasUno() ) {
+                    Platform.runLater(() -> msg.setText(p.getName() + " has Uno!"));
+                    Thread.sleep(1000);
+                }
+                if ( p.hasWon() ) {
+                    Platform.runLater(() -> msg.setText(p.getName() + " WON!"));
+                    isPlaying = false;
+                }
+
+                int skipTo = UnoGame.skipTo;
+                if ( UnoGame.isReversed ) {
+                    players.rewind(skipTo);
+                }
+                else {
+                    players.fastForward(skipTo);
+                }
             }
-        } catch( NullPointerException n ) {
-            sp = new StackPane[5];
-            for ( int i = 0; i < sp.length; i++ ) {
-                sp[i] = CardBuilder.getCardBack();
-            }
+        } catch( InterruptedException i ) {
+            i.printStackTrace();
         }
     }
-    */
 }

@@ -53,6 +53,7 @@ public class CDLList<T extends Comparable<T>> {
             //do some spicy exception handling
             throw new UnsupportedOperationException();
         }
+        reorientList();
 
         Node<T> loc = findItem(item);
         if ( loc == null || loc.info.compareTo(item) != 0 ) {
@@ -92,8 +93,12 @@ public class CDLList<T extends Comparable<T>> {
 
         int numIters = 0;
         while ( numIters < length ) {
-            if ( (copy.info).compareTo(item) <= 0 ) {
+            if ( (copy.info).compareTo(item) < 0 ) {
                 pred = copy;
+            }
+            else if ( (copy.info).compareTo(item) == 0 ) {
+                pred = copy;
+                break;
             }
             else {
                 break;
@@ -104,6 +109,15 @@ public class CDLList<T extends Comparable<T>> {
         }
 
         return pred;
+    }
+
+    public void reorientList() {
+        //make list go from smallest to largest again
+        if ( head != null ) {
+            while ( head.info.compareTo(head.prev.info) > 0 ) {
+                head = head.next;
+            }
+        }
     }
 
     public void fastForward(int n) {
