@@ -48,17 +48,17 @@ public class CDLList<T extends Comparable<T>> {
         length++;
     }
 
-    public void delete(T item) {
+    public void delete(T item) throws EmptyListException, NotInListException {
         if ( isEmpty() ) {
             //do some spicy exception handling
-            throw new UnsupportedOperationException();
+            throw new EmptyListException("List is empty");
         }
         reorientList();
 
         Node<T> loc = findItem(item);
         if ( loc == null || loc.info.compareTo(item) != 0 ) {
             //do some spicy exception handling
-            throw new UnsupportedOperationException();
+            throw new NotInListException("Item is not in list");
         }
 
         loc.prev.next = loc.next;

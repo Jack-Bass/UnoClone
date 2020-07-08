@@ -1,6 +1,9 @@
 package com.game;
 
 import com.adt.CDLList;
+import com.adt.EmptyListException;
+import com.adt.NotInListException;
+
 import java.util.Stack;
 
 public class Hand {
@@ -26,10 +29,16 @@ public class Hand {
     public Stack<Card> emptyHand() {
         Stack<Card> discard = new Stack<>();
 
-        for ( int i = 0; i < hand.getLength(); i++ ) {
-            Card c = hand.getAt(0);
-            discard.push(c);
-            hand.delete(c);
+        try {
+            for ( int i = 0; i < hand.getLength(); i++ ) {
+                Card c = hand.getAt(0);
+                discard.push(c);
+                hand.delete(c);
+            }
+        } catch(EmptyListException e) {
+            e.printStackTrace();
+        } catch(NotInListException n) {
+            n.printStackTrace();
         }
 
         return discard;
@@ -38,7 +47,7 @@ public class Hand {
     @Override
     public String toString() {
         String str = "";
-
+        
         for ( int i = 0; i < hand.getLength(); i++ ) {
             str += hand.getAt(i).toString() + ", ";
         }

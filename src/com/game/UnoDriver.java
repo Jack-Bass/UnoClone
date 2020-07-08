@@ -1,6 +1,5 @@
 package com.game;
 
-//import com.adt.CDLList;
 import javafx.application.Application;
 
 public class UnoDriver {

@@ -1,5 +1,8 @@
 package com.game;
 
+import com.adt.EmptyListException;
+import com.adt.NotInListException;
+
 import javafx.application.Platform;
 
 abstract class Player extends UnoGame implements Comparable<Player> {
@@ -100,11 +103,17 @@ abstract class Player extends UnoGame implements Comparable<Player> {
     public void playCard(Card c) {
         try {
             Platform.runLater(() -> {
-                msg.setText(name + " plays " + c.toString());
-                hand.getCards().delete(c);
-                updateImmediateCards();
-                discard.push(c);
-                CardImage.rewriteCard(discardGraphic, c);
+                try {
+                    msg.setText(name + " plays " + c.toString());
+                    hand.getCards().delete(c);
+                    updateImmediateCards();
+                    discard.push(c);
+                    CardImage.rewriteCard(discardGraphic, c);
+                } catch(NotInListException n) {
+                    n.printStackTrace();
+                } catch(EmptyListException e) {
+                    e.printStackTrace();
+                }
             });
             //see if dummy card is on top
             if ( discard.peek().getValue() == Card.Value.BACK ) {

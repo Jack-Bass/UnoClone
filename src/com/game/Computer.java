@@ -1,6 +1,7 @@
 package com.game;
 
 import java.util.Random;
+
 import javafx.scene.control.Label;
 import javafx.scene.text.Font;
 import javafx.geometry.Pos;
