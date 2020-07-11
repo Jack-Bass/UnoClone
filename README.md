@@ -1,6 +1,6 @@
 # UnoClone
 
-![Image of an Uno Game](https://imgur.com/eMuDe6Y)
+![Image of an Uno Game](https://i.imgur.com/eMuDe6Y.png)
 
 ## Introduction
 
