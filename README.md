@@ -16,4 +16,4 @@ The game has you play against three computer players.  Relevant game information
 
 When it's your turn, simply click a card, and it will be played if it's valid.  You can cycle through cards by clicking the left and right buttons.  A card is valid if it matches the color or the value of the discard pile's top card or if it's a Wild Card (Wild or Wild Draw 4).  You can play one card each turn, and if you have no valid cards, the game will automatically play the first valid card in the deck.
 
-The game keeps playing until a player has zero cards, and it will end.  Have fun!
+The game keeps playing until a player has zero cards, and you will be prompted to play again.  Have fun!
