@@ -2,7 +2,6 @@ package com.game;
 
 import com.adt.EmptyListException;
 import com.adt.NotInListException;
-
 import javafx.application.Platform;
 
 abstract class Player extends UnoGame implements Comparable<Player> {
@@ -30,7 +29,7 @@ abstract class Player extends UnoGame implements Comparable<Player> {
         return hand;
     }
 
-    public void initHand() {
+    public void initHand() throws EmptyListException {
         for ( int i = 0; i < 7; i++ ) {
             hand.addCard(deck.draw());
         }
@@ -45,6 +44,10 @@ abstract class Player extends UnoGame implements Comparable<Player> {
     abstract void playTurn();
 
     abstract void promptForNewColor();
+
+    public void returnCardsToDeck() {
+        hand.emptyHand(deck);
+    }
 
     public boolean canPlay(Card c) {
         Card top = discard.peek();
@@ -73,17 +76,23 @@ abstract class Player extends UnoGame implements Comparable<Player> {
     }
 
     public void playFirstAvailableCard() {
-        hand.getCards().reorientList();
-        Card c = deck.draw();
-        hand.getCards().add(c);
-        while ( !canPlay(c) ) {
+        try {
             if ( deck.isEmpty() ) {
                 resetDeck();
             }
-            c = deck.draw();
+            Card c = deck.draw();
             hand.getCards().add(c);
+            while ( !canPlay(c) ) {
+                if ( deck.isEmpty() ) {
+                    resetDeck();
+                }
+                c = deck.draw();
+                hand.getCards().add(c);
+            }
+            playCard(c);
+        } catch(EmptyListException e) {
+            e.printStackTrace();
         }
-        playCard(c);
     }
 
     public void changeColor(Card.Color newColor) {

@@ -48,7 +48,9 @@ public class Human extends Player {
                         updateImmediateCards();
                     }
                     else {
-                        msg.setText("Cannot play " + c.toString());
+                        Platform.runLater(() -> {
+                            msg.setText("Cannot play " + c.toString());
+                        });
                     }
                 }
             });

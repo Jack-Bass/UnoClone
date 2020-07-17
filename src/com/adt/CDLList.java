@@ -28,6 +28,7 @@ public class CDLList<T extends Comparable<T>> {
             head.prev = head;
         }
         else {
+            reorientList();
             Node<T> pred = findItem(item);
 
             if ( pred == null ) {
@@ -114,8 +115,17 @@ public class CDLList<T extends Comparable<T>> {
     public void reorientList() {
         //make list go from smallest to largest again
         if ( head != null ) {
-            while ( head.info.compareTo(head.prev.info) > 0 ) {
-                head = head.next;
+            //infinite loop scenarios
+            if ( length == 1 ) {
+                return;
+            }
+            else if ( length == 2 && head.info == head.next.info ) {
+                return;
+            }
+            else {
+                while ( head.info.compareTo(head.prev.info) >= 0 ) {
+                    head = head.next;
+                }
             }
         }
     }

@@ -1,6 +1,7 @@
 package com.game;
 
 import com.adt.CDLList;
+import com.adt.EmptyListException;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.stage.Stage;
@@ -10,9 +11,13 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Font;
 import javafx.scene.control.Label;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.geometry.Pos;
 import java.lang.Thread;
+import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
 
 public class UnoApp extends Application {
     //app objects
@@ -145,23 +150,26 @@ public class UnoApp extends Application {
 
     private void playGame() {
         //game variables
-        boolean isPlaying = true;
         CDLList<Player> players = new CDLList<>();
         players.add(human);
         players.add(com1);
         players.add(com2);
         players.add(com3);
 
-        UnoGame.initDeck();
-        for ( int i = 0; i < players.getLength(); i++ ) {
-            players.getAt(i).initHand();
-            players.getAt(i).updateImmediateCards();
+        try {
+            UnoGame.initDeck();
+            for ( int i = 0; i < players.getLength(); i++ ) {
+                players.getAt(i).initHand();
+                players.getAt(i).updateImmediateCards();
+            }
+            UnoGame.initDiscard();
+        } catch( EmptyListException e ) {
+            e.printStackTrace();
         }
-        UnoGame.initDiscard();
 
         try {
             Thread.sleep(2000);
-            while ( isPlaying ) {
+            while ( true ) {
                 //play a turn
                 Player p = players.getAt(0);
                 Platform.runLater(() -> {
@@ -172,7 +180,6 @@ public class UnoApp extends Application {
                 //play player's turn
                 int numDraw = UnoGame.numDraw;
                 if ( numDraw > 0 ) {
-                    p.getHand().getCards().reorientList();
                     for ( int i = 0; i < numDraw; i++ ) {
                         if ( UnoGame.deck.isEmpty() ) {
                             UnoGame.resetDeck();
@@ -185,9 +192,7 @@ public class UnoApp extends Application {
                     }
                     UnoGame.skipTo = 1;
                     UnoGame.numDraw = 0;
-                    Platform.runLater(() -> {
-                        p.updateImmediateCards();
-                    });
+                    p.updateImmediateCards();
                 }
                 else if ( !p.canPlayAnyCards() ) {
                     p.playFirstAvailableCard();
@@ -204,7 +209,24 @@ public class UnoApp extends Application {
                 }
                 if ( p.hasWon() ) {
                     Platform.runLater(() -> msg.setText(p.getName() + " WON!"));
-                    isPlaying = false;
+                    
+                    //await player's response
+                    final CountDownLatch latch = new CountDownLatch(1);
+                    Platform.runLater(() -> {
+                        try {
+                            promptForReplay();
+                        } finally {
+                            latch.countDown();
+                        }
+                    });
+
+                    try {
+                        latch.await();
+                    } catch ( InterruptedException i ) {
+                        //wait
+                    }
+
+                    resetGame(players);
                 }
 
                 int skipTo = UnoGame.skipTo;
@@ -217,6 +239,53 @@ public class UnoApp extends Application {
             }
         } catch( InterruptedException i ) {
             i.printStackTrace();
+        } catch( EmptyListException e ) {
+            e.printStackTrace();
+        }
+    }
+
+    private void promptForReplay() {
+        //create options
+        ButtonType again = new ButtonType("Play again");
+        ButtonType quit = new ButtonType("Quit");
+
+        //create Alert
+        Alert option = new Alert(Alert.AlertType.CONFIRMATION);
+        option.getButtonTypes().setAll(again, quit);
+
+        Optional<ButtonType> choice = option.showAndWait();
+        if ( choice.get() == again ) {
+            return;
+        }
+        else {
+            System.exit(0);
+        }
+    }
+
+    private void resetGame(CDLList<Player> players) {
+        try {
+            //since player hasn't exited, reset game
+            for ( int i = 0; i < players.getLength(); i++ ) {
+                players.getAt(i).returnCardsToDeck();
+                players.getAt(i).updateImmediateCards();
+            }
+            UnoGame.resetDiscard();
+            UnoGame.initDeck();
+            for ( int i = 0; i < players.getLength(); i++ ) {
+                players.getAt(i).initHand();
+                players.getAt(i).updateImmediateCards();
+            }
+            UnoGame.initDiscard();
+            UnoGame.isReversed = false;
+            UnoGame.numDraw = 0;
+
+            //return turn order to human
+            while ( players.getAt(0) != human ) {
+                players.fastForward(1);
+            }
+            UnoGame.skipTo = 0;
+        } catch( EmptyListException e ) {
+            e.printStackTrace();
         }
     }
 }

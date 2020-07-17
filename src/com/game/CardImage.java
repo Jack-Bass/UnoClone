@@ -5,6 +5,7 @@ import javafx.scene.shape.Ellipse;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.scene.text.Font;
+import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.layout.StackPane;
 
@@ -39,10 +40,12 @@ public class CardImage {
         StackPane newCard = getCardFront(c);
         Node[] layers = newCard.getChildren().stream().toArray(Node[]::new);
 
-        original.getChildren().clear();
-        for ( int i = 0; i < layers.length; i++ ) {
-            original.getChildren().add(layers[i]);
-        }
+        Platform.runLater(() -> {
+            original.getChildren().clear();
+            for ( int i = 0; i < layers.length; i++ ) {
+                original.getChildren().add(layers[i]);
+            }
+        });
     }
 
     private static Rectangle getCardBase() {

@@ -4,6 +4,7 @@ import java.util.Random;
 
 import javafx.scene.control.Label;
 import javafx.scene.text.Font;
+import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.layout.StackPane;
 
@@ -34,10 +35,9 @@ public class Computer extends Player {
 
     public void updateImmediateCards() {
         int handSize = getHand().getCards().getLength();
-        if ( handSize == 0 ) {
-            immediateCard.setVisible(false);
-        }
-        numCards.setText("x" + Integer.toString(handSize));
+        Platform.runLater(() -> {
+            numCards.setText("x" + Integer.toString(handSize));
+        });
     }
 
     @Override

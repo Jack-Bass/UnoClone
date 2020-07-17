@@ -2,6 +2,8 @@ package com.game;
 
 import java.util.Stack;
 
+import com.adt.EmptyListException;
+
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 
@@ -19,7 +21,7 @@ public class UnoGame {
         deck.shuffle();
     }
 
-    public static void initDiscard() {
+    public static void initDiscard() throws EmptyListException {
         Card draw = deck.draw();
 
         //stop action cards from starting the pile
@@ -40,5 +42,16 @@ public class UnoGame {
         }
         deck.shuffle();
         discard.push(top);
+    }
+
+    public static void resetDiscard() {
+        while ( !discard.empty() ) {
+            if ( discard.peek().getValue() == Card.Value.BACK ) {
+                discard.pop();
+            }
+            else {
+                deck.add(discard.pop());
+            }
+        }
     }
 }

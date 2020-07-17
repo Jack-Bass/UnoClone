@@ -1,6 +1,7 @@
 package com.game;
 
 import java.util.Random;
+import com.adt.EmptyListException;
 
 public class Deck {
     //instance variables
@@ -50,9 +51,9 @@ public class Deck {
         return (deck.length == 108);
     }
 
-    public Card draw() {
+    public Card draw() throws EmptyListException {
         if ( isEmpty() ) {
-            throw new UnsupportedOperationException();
+            throw new EmptyListException("Deck is empty");
         }
 
         //return first card to Player
