@@ -1,7 +1,5 @@
 package com.game;
 
-import java.util.Random;
-
 import javafx.scene.control.Label;
 import javafx.scene.text.Font;
 import javafx.application.Platform;
@@ -53,20 +51,40 @@ public class Computer extends Player {
 
     @Override
     public void promptForNewColor() {
-        Random rand = new Random();
-        switch( rand.nextInt(4) ) {
-            case 0:
+        //find color with most cards
+        int[] numEachColor = {0, 0, 0, 0}; //[Red, Green, Blue, Yellow]
+        for ( int i = 0; i < getHand().getLength(); i++ ) {
+            switch( getHand().getCards().getAt(i).getColor() ) {
+                case RED:
+                numEachColor[0]++;
+                break;
+                case GREEN:
+                numEachColor[1]++;
+                break;
+                case BLUE:
+                numEachColor[2]++;
+                break;
+                case YELLOW:
+                numEachColor[3]++;
+                break;
+                default:
+                break;
+            }
+        }
+        //equiv to Max(1, Max(2, Max(3, 4)))
+        int max = Math.max(numEachColor[0], Math.max(numEachColor[1], Math.max(numEachColor[2], numEachColor[3])));
+
+        if ( max == numEachColor[0] ) {
             changeColor(Card.Color.RED);
-            return;
-            case 1:
+        }
+        else if ( max == numEachColor[1] ) {
             changeColor(Card.Color.GREEN);
-            return;
-            case 2:
+        }
+        else if ( max == numEachColor[2] ) {
             changeColor(Card.Color.BLUE);
-            return;
-            default:
+        }
+        else {
             changeColor(Card.Color.YELLOW);
-            return;
         }
     }
 }

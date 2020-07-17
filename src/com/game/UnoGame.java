@@ -25,7 +25,7 @@ public class UnoGame {
         Card draw = deck.draw();
 
         //stop action cards from starting the pile
-        while ( draw.getValue().getValue() > 10 ) {
+        while ( draw.getValue().getValue() >= 10 ) {
             deck.add(draw);
             draw = deck.draw();
         }
