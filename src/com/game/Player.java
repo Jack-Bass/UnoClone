@@ -49,19 +49,52 @@ abstract class Player extends UnoGame implements Comparable<Player> {
         hand.emptyHand(deck);
     }
 
-    public boolean canPlay(Card c) {
-        Card top = discard.peek();
-        if ( c.getColor() == top.getColor() || c.getValue() == top.getValue() ) {
-            return true;
+    public boolean canPlayDraw2Or4(Card c) {
+        //case 1: top is Wild or Wild Draw4
+        if ( discard.peek().getValue() == Card.Value.BACK ) {
+            Card temp = discard.pop();
+            Card.Value type = discard.peek().getValue();
+            discard.push(temp);
+
+            if ( c.getValue() == Card.Value.DRAW4 && c.getValue() == type ) {
+                return true;
+            }
+            return false;
         }
-        else if ( c.getColor() == top.getColor() && top.getValue() == Card.Value.BACK ) {
-            return true;
+        //case 2: top is a draw2
+        else if ( discard.peek().getValue() == Card.Value.DRAW2 ) {
+            if ( c.getValue() == Card.Value.DRAW2 ) {
+                return true;
+            }
+            return false;
         }
-        else if ( c.getColor() == Card.Color.BLACK ) {
-            return true;
-        }
+        //case 3: top is anything else
         else {
             return false;
+        }
+    }
+
+    public boolean canPlay(Card c) {
+        if ( numDraw > 0 ) {
+            if ( canPlayDraw2Or4(c) ) {
+                return true;
+            }
+            return false;
+        }
+        else {
+            Card top = discard.peek();
+            if ( c.getColor() == top.getColor() || c.getValue() == top.getValue() ) {
+                return true;
+            }
+            else if ( c.getColor() == top.getColor() && top.getValue() == Card.Value.BACK ) {
+                return true;
+            }
+            else if ( c.getColor() == Card.Color.BLACK ) {
+                return true;
+            }
+            else {
+                return false;
+            }
         }
     }
 
@@ -134,11 +167,11 @@ abstract class Player extends UnoGame implements Comparable<Player> {
             if ( c.getColor() == Card.Color.BLACK ) {
                 promptForNewColor();
                 if ( c.getValue() == Card.Value.DRAW4 ) {
-                    numDraw = 4;
+                    numDraw += 4;
                 }
             }
             else if ( c.getValue() == Card.Value.DRAW2 ) {
-                numDraw = 2;
+                numDraw += 2;
             }
             else if ( c.getValue() == Card.Value.SKIP ) {
                 skipTo++;

@@ -179,23 +179,25 @@ public class UnoApp extends Application {
 
                 //play player's turn
                 int numDraw = UnoGame.numDraw;
-                if ( numDraw > 0 ) {
-                    for ( int i = 0; i < numDraw; i++ ) {
-                        if ( UnoGame.deck.isEmpty() ) {
-                            UnoGame.resetDeck();
+                if ( !p.canPlayAnyCards() ) {
+                    if ( numDraw > 0 ) {
+                        for ( int i = 0; i < numDraw; i++ ) {
+                            if ( UnoGame.deck.isEmpty() ) {
+                                UnoGame.resetDeck();
+                            }
+                            p.getHand().getCards().add(UnoGame.deck.draw());
+                            Platform.runLater(() -> {
+                                msg.setText(p.getName() + " drew " + numDraw + " cards!");
+                            });
+                            Thread.sleep(1000);
                         }
-                        p.getHand().getCards().add(UnoGame.deck.draw());
-                        Platform.runLater(() -> {
-                            msg.setText(p.getName() + " drew " + numDraw + " cards!");
-                        });
-                        Thread.sleep(1000);
+                        UnoGame.skipTo = 1;
+                        UnoGame.numDraw = 0;
+                        p.updateImmediateCards();
                     }
-                    UnoGame.skipTo = 1;
-                    UnoGame.numDraw = 0;
-                    p.updateImmediateCards();
-                }
-                else if ( !p.canPlayAnyCards() ) {
-                    p.playFirstAvailableCard();
+                    else {
+                        p.playFirstAvailableCard();
+                    }
                 }
                 else {
                     p.playTurn();
